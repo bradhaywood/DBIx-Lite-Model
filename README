@@ -1,0 +1,56 @@
+NAME
+    DBIx::Lite::Model - Centralise DBIx::Lite models in YAML
+
+DESCRIPTION
+    This module is a subclass of DBIx::Lite. It allows you to centralise
+    your model configuration in yaml files for easy reusability.
+
+SYNOPSIS
+    Create a yaml file. You may wish to have one model have the connection
+    information, then you can create other models within that yaml file
+    which use that model for their connection. An example is below.
+
+        # mydb.yml
+        MyDB:
+            connect: Pg:dbname=some_db
+            user: foo_user
+            pass: foo_pass
+    
+        Client:
+            model: MyDB
+            table: clients
+            primary_key: id
+    
+        Customer:
+            model: EcmDB
+            table: customers
+            primary_key: id
+            related: clients <-> customers(client_id)
+
+    This allows us to do stuff like
+
+        # test.pl
+        use DBIx::Lite::Model;
+    
+        my $dbix = DBIx::Lite::Model->new;  # Creates a new instance
+        $dbix->config('mydb.yml');          # load the configuration
+
+        my $customer_rs = $dbix->model('Customer'); # Returns the Customer ResultSet
+        my $client_rs   = $dbix->model('Client');   # Returns the Client ResultSet
+
+        # we want to find out what customers client with id 5 has
+        my $customers = $client_rs->find(5)->customers;
+        $customers->single->name; # returns the name of the clients first customer
+
+AUTHOR
+    Brad Haywood <brad@perlpowered.com>
+
+    Allessandro Ranellucci is the author of DBIx::Lite
+
+SEE ALSO
+    DBIx::Lite
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
