@@ -98,7 +98,7 @@ Create a yaml file. You may wish to have one model have the connection informati
         primary_key: id
     
     Customer:
-        model: EcmDB
+        model: MyDB
         table: customers
         primary_key: id
         related: clients <-> customers(client_id)
